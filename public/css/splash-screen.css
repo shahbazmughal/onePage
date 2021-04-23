@@ -2,6 +2,30 @@ body {
   margin: 0;
   padding: 0;
 }
+body {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  color: #3f4254;
+}
+#root {
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 13px!important;
+  font-weight: 400;
+  font-family: Poppins,Helvetica,"sans-serif";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 #splash-screen {
   position: absolute;
   z-index: 1000;
@@ -12,6 +36,12 @@ body {
   justify-content: center;
   flex-direction: column;
   background-color: #f2f3f8;
+}
+img, svg {
+  vertical-align: middle;
+}
+img {
+  border-style: none;
 }
 
 #splash-screen img {
@@ -36,7 +66,17 @@ body {
   stroke-linecap: round;
   animation: dash 1.5s ease-in-out infinite;
 }
-
+svg.splash-spinner {
+  animation: rotate 2s linear infinite;
+  margin-left: calc(100vw - 100%);
+  width: 50px;
+  height: 50px;
+}
+svg.splash-spinner circle.path {
+  stroke: #5d78ff;
+  stroke-linecap: round;
+  animation: dash 1.5s ease-in-out infinite;
+}
 @keyframes rotate {
   100% {
     transform: rotate(360deg);

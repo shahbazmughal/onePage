@@ -6,6 +6,10 @@ import { Link } from "react-router-dom";
 import { injectIntl } from "react-intl";
 import * as auth from "../_redux/authRedux";
 import { register } from "../_redux/authCrud";
+import { useHistory, useLocation } from "react-router-dom";
+import {Form} from "react-bootstrap";
+import "../../../../_metronic/_assets/sass/pages/register/register.scss";
+import { Range } from 'react-range';
 
 const initialValues = {
   fullname: "",
@@ -16,6 +20,12 @@ const initialValues = {
 };
 
 function RegistrationStep2(props) {
+
+  const history = useHistory();
+  const location = useLocation();
+
+  //console.log(location.state.name, location.state.email, location.state.password)
+
   const { intl } = props;
   const [loading, setLoading] = useState(false);
   const RegistrationSchema = Yup.object().shape({
@@ -26,40 +36,7 @@ function RegistrationStep2(props) {
         intl.formatMessage({
           id: "AUTH.VALIDATION.REQUIRED_FIELD",
         })
-      ),
-    email: Yup.string()
-      .email("Wrong email format")
-      .min(3, "Minimum 3 symbols")
-      .max(50, "Maximum 50 symbols")
-      .required(
-        intl.formatMessage({
-          id: "AUTH.VALIDATION.REQUIRED_FIELD",
-        })
-      ),
-    password: Yup.string()
-      .min(3, "Minimum 3 symbols")
-      .max(50, "Maximum 50 symbols")
-      .required(
-        intl.formatMessage({
-          id: "AUTH.VALIDATION.REQUIRED_FIELD",
-        })
-      ),
-    changepassword: Yup.string()
-      .required(
-        intl.formatMessage({
-          id: "AUTH.VALIDATION.REQUIRED_FIELD",
-        })
       )
-      .when("password", {
-        is: (val) => (val && val.length > 0 ? true : false),
-        then: Yup.string().oneOf(
-          [Yup.ref("password")],
-          "Password and Confirm Password didn't match"
-        ),
-      }),
-    acceptTerms: Yup.bool().required(
-      "You must accept the terms and conditions"
-    ),
   });
 
   const enableLoading = () => {
@@ -87,175 +64,246 @@ function RegistrationStep2(props) {
     validationSchema: RegistrationSchema,
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setSubmitting(true);
-      enableLoading();
-      register(values.email, values.fullname, values.password)
-        .then(({ data: { authToken } }) => {
-          props.register(authToken);
-          disableLoading();
-          setSubmitting(false);
-        })
-        .catch(() => {
-          setSubmitting(false);
-          setStatus(
-            intl.formatMessage({
-              id: "AUTH.VALIDATION.INVALID_LOGIN",
-            })
-          );
-          disableLoading();
-        });
+      console.log(values)
     },
   });
+
+  const handleChange = name => event => {
+		//console.log(name,event.target.value)
+	    setState({ ...state, [name]: event.target.value});
+      setValues({ ...values, [name]: event.target.value });
+      console.log(values.package)
+	};
+
+  const [values, setValues] = useState({
+    package:""
+  });
+
+  const [state, setState] = useState({
+    package:"",
+    pkgSliderBlk1: "hide",
+    pkgSliderBlk2: "hide",
+    pkgSliderBlk3: "hide",
+    range1: [10000],
+    range2: [6000],
+    range3: [1000]
+  });
+
+  console.log(state.range1)
+
+  const nextStep =()=> {
+    console.log(values.package)
+  }
+
+  const freePlan =()=> {
+    setState({...state, pkgSliderBlk1:"hide", pkgSliderBlk2: "hide", pkgSliderBlk3: "hide"});
+    console.log("Free Plan")
+  }
+
+  const marketingPlan =()=> {
+    setState({...state, pkgSliderBlk1:"show", pkgSliderBlk2: "hide", pkgSliderBlk3: "hide"});
+    console.log("marketing Plan")
+  }
+
+  const transactionalPlan =()=> {
+    setState({...state, pkgSliderBlk1:"hide", pkgSliderBlk2: "show", pkgSliderBlk3: "show"});
+    console.log("transactional Plan")
+  }
 
   return (
     <div className="login-form login-signin" style={{ display: "block" }}>
       <div className="pb-13 pt-lg-0 pt-5">
-        <h3 className="font-weight-bolder text-dark font-size-h4 font-size-h1-lg">Sign Up - step 2</h3>
-        <p className="text-muted font-weight-bold font-size-h4">Enter your details to complete registration.</p>
+        <h3 className="font-weight-bolder text-dark font-size-h4 font-size-h1-lg">Package Information</h3>
+        <p className="text-muted font-weight-bold font-size-h4">Select Package Below.</p>
       </div>
 
-      <form
-        id="kt_login_signin_form"
-        className="form fv-plugins-bootstrap fv-plugins-framework animated animate__animated animate__backInUp"
-        onSubmit={formik.handleSubmit}
-      >
-        {/* begin: Alert */}
-        {formik.status && (
-          <div className="mb-10 alert alert-custom alert-light-danger alert-dismissible">
-            <div className="alert-text font-weight-bold">{formik.status}</div>
-          </div>
-        )}
-        {/* end: Alert */}
-
-        {/* begin: Fullname */}
-        <div className="form-group fv-plugins-icon-container">
-          <input
-            placeholder="Full name"
-            type="text"
-            className={`form-control form-control-solid h-auto py-6 px-6 rounded-lg font-size-h6 ${getInputClasses(
-              "fullname"
-            )}`}
-            name="fullname"
-            {...formik.getFieldProps("fullname")}
+      <div key={`custom-radio`} className="mb-3">
+        <div className="checkBlk" onClick={freePlan}>
+          <Form.Check
+            custom
+            name="package"
+            type="radio"
+            id={`custom-1`}
+            value="1"
+            onChange={handleChange("package")}
+            label={`Free Plan`}
           />
-          {formik.touched.fullname && formik.errors.fullname ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.fullname}</div>
-            </div>
-          ) : null}
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
         </div>
-        {/* end: Fullname */}
-
-        {/* begin: Email */}
-        <div className="form-group fv-plugins-icon-container">
-          <input
-            placeholder="Email"
-            type="email"
-            className={`form-control form-control-solid h-auto py-6 px-6 rounded-lg font-size-h6 ${getInputClasses(
-              "email"
-            )}`}
-            name="email"
-            {...formik.getFieldProps("email")}
-          />
-          {formik.touched.email && formik.errors.email ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.email}</div>
-            </div>
-          ) : null}
-        </div>
-        {/* end: Email */}
-
-        {/* begin: Password */}
-        <div className="form-group fv-plugins-icon-container">
-          <input
-            placeholder="Password"
-            type="password"
-            className={`form-control form-control-solid h-auto py-6 px-6 rounded-lg font-size-h6 ${getInputClasses(
-              "password"
-            )}`}
-            name="password"
-            {...formik.getFieldProps("password")}
-          />
-          {formik.touched.password && formik.errors.password ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.password}</div>
-            </div>
-          ) : null}
-        </div>
-        {/* end: Password */}
-
-        {/* begin: Confirm Password */}
-        <div className="form-group fv-plugins-icon-container">
-          <input
-            placeholder="Confirm Password"
-            type="password"
-            className={`form-control form-control-solid h-auto py-6 px-6 rounded-lg font-size-h6 ${getInputClasses(
-              "changepassword"
-            )}`}
-            name="changepassword"
-            {...formik.getFieldProps("changepassword")}
-          />
-          {formik.touched.changepassword && formik.errors.changepassword ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">
-                {formik.errors.changepassword}
-              </div>
-            </div>
-          ) : null}
-        </div>
-        {/* end: Confirm Password */}
-
-        {/* begin: Terms and Conditions */}
-        <div className="form-group fv-plugins-icon-container has-success">
-          <label className="checkbox mb-0">
-            <input
-              type="checkbox"
-              name="acceptTerms"
-              className="is-valid"
-              {...formik.getFieldProps("acceptTerms")}
+        <div className="checkBlk" onClick={marketingPlan}>
+          <div onClick={marketingPlan}>
+            <Form.Check
+              custom
+              name="package"
+              type="radio"
+              id={`custom-2`}
+              value="2"
+              onChange={handleChange("package")}
+              label={`Marketing & Newsletters`}
             />
-            <span />
-            <div className="ml-2">I Agree the 
-              <Link
-                to="/terms"
-                target="_blank"
-                className="ml-1"
-                rel="noopener noreferrer"
-              >
-                 terms &amp; conditions
-              </Link>.
-            </div>
-          </label>
-          {formik.touched.acceptTerms && formik.errors.acceptTerms ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.acceptTerms}</div>
-            </div>
-          ) : null}
+          </div>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
         </div>
-        {/* end: Terms and Conditions */}
-        <div className="form-group d-flex flex-wrap pb-lg-0 pb-3">
-          <button
-            type="submit"
-            disabled={
-              formik.isSubmitting ||
-              !formik.isValid ||
-              !formik.values.acceptTerms
-            }
-            className="btn btn-primary font-weight-bolder font-size-h6 px-8 py-4 my-3 mr-4"
-          >
-            <span>Submit</span>
-            {loading && <span className="ml-3 spinner spinner-white"></span>}
-          </button>
+        <div className={`package-inner-blk `+ state.pkgSliderBlk1}>
+          <div className="form-group" id="marketing_slider">
+            <h4 className="package_name">10k</h4> 
+            <h5 className="emails1 db_email">{state.range1} <span>Email</span></h5>
+            <Range
+              step={10000}
+              min={10000}
+              max={20000}
+              values={state.range1}
+              onChange={(values) => setState({...state,range1: values })}
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '10px',
+                    width: '90%',
+                    borderRadius:'10px',
+                    backgroundColor: '#ccc',
+                    marginBottom:'35px',
+                    marginLeft:'5%'
+                  }}
+                >
+                  {children}
+                </div>
+              )}
+              renderThumb={({ props }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '36px',
+                    width: '36px',
+                    border:"4px solid #3699ff",
+                    borderRadius:'30px',
+                    backgroundColor: '#FFF'
+                  }}
+                />
+              )}
+            />
+          </div>
+        </div>
+        <div className="checkBlk">
+          <div onClick={transactionalPlan}>
+            <Form.Check
+              custom
+              name="package"
+              type="radio"
+              id={`custom-3`}
+              value="3"
+              onChange={handleChange("package")}
+              label={`Transactional & Marketing`}
+            />
+          </div>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+        </div>
+        <div className={`package-inner-blk blk2 `+ state.pkgSliderBlk2}>
+          <div className="form-group" id="transaction_slider_pkg">
+            <h4 className="package_name">Default Package</h4> 
+            <h5 className="emails1 db_email">{state.range2} <span>Email</span></h5>
+            <Range
+              step={6000}
+              min={6000}
+              max={50000}
+              values={state.range2}
+              onChange={(values) => setState({...state,range2: values })}
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '10px',
+                    width: '90%',
+                    borderRadius:'10px',
+                    backgroundColor: '#ccc',
+                    marginBottom:'35px',
+                    marginLeft:'5%'
+                  }}
+                >
+                  {children}
+                </div>
+              )}
+              renderThumb={({ props }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '36px',
+                    width: '36px',
+                    border:"4px solid #3699ff",
+                    borderRadius:'30px',
+                    backgroundColor: '#FFF'
+                  }}
+                />
+              )}
+            />
+          </div>
+        </div>
+        <div className={`package-inner-blk blk3 `+ state.pkgSliderBlk3}>
+          <div className="form-group" id="transaction_slider_contacts">
+            <h4 className="package_name">Number of contacts</h4> 
+            <h5 className="emails1 db_email">{state.range3}  <span>Contacts</span></h5>
+            <Range
+              step={1000}
+              min={1000}
+              max={199000}
+              values={state.range3}
+              onChange={(values) => setState({...state,range3: values })}
+              renderTrack={({ props, children }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '10px',
+                    width: '90%',
+                    borderRadius:'10px',
+                    backgroundColor: '#ccc',
+                    marginBottom:'35px',
+                    marginLeft:'5%'
+                  }}
+                >
+                  {children}
+                </div>
+              )}
+              renderThumb={({ props }) => (
+                <div
+                  {...props}
+                  style={{
+                    ...props.style,
+                    height: '36px',
+                    width: '36px',
+                    border:"4px solid #3699ff",
+                    borderRadius:'30px',
+                    backgroundColor: '#FFF'
+                  }}
+                />
+              )}
+            />
+          </div>
+        </div>
+      </div>
 
-          <Link to="/auth/login">
-            <button
-              type="button"
-              className="btn btn-light-primary font-weight-bolder font-size-h6 px-8 py-4 my-3"
-            >
-              Cancel
-            </button>
-          </Link>
-        </div>
-      </form>
+      <div className="reg2ActionBlk">
+        <Link to="/auth/registration">
+          <button
+            type="button"
+            className="btn btn-light-primary font-weight-bolder font-size-h6 px-8 py-4 my-3"
+          >
+            Back
+          </button>
+        </Link>
+        <button
+          type="button"
+          className="btn btn-primary font-weight-bolder font-size-h6 px-8 py-4 my-3 ml-4 pull-ight"
+          onClick={nextStep}
+        >
+          <span>Next</span>
+        </button>
+      </div>
+        
     </div>
   );
 }

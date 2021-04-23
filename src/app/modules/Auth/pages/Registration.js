@@ -6,16 +6,18 @@ import { Link } from "react-router-dom";
 import { injectIntl } from "react-intl";
 import * as auth from "../_redux/authRedux";
 import { register } from "../_redux/authCrud";
+import { useHistory } from "react-router-dom";
 
 const initialValues = {
   fullname: "",
   email: "",
   password: "",
   changepassword: "",
-  acceptTerms: false,
+  acceptTerms: true,
 };
 
 function Registration(props) {
+  const history = useHistory();
   const { intl } = props;
   const [loading, setLoading] = useState(false);
   const RegistrationSchema = Yup.object().shape({
@@ -88,21 +90,16 @@ function Registration(props) {
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setSubmitting(true);
       enableLoading();
-      register(values.email, values.fullname, values.password)
-        .then(({ data: { authToken } }) => {
-          props.register(authToken);
-          disableLoading();
-          setSubmitting(false);
-        })
-        .catch(() => {
-          setSubmitting(false);
-          setStatus(
-            intl.formatMessage({
-              id: "AUTH.VALIDATION.INVALID_LOGIN",
-            })
-          );
-          disableLoading();
-        });
+      history.push({
+        pathname: '/auth/registration-step2',
+        state: {
+          name:values.fullname,
+          email:values.email,
+          password:values.password
+        }
+      });
+      disableLoading();
+      console.log(values.email, values.fullname, values.password)
     },
   });
 
@@ -211,6 +208,7 @@ function Registration(props) {
               type="checkbox"
               name="acceptTerms"
               className="is-valid"
+              checked="checked"
               {...formik.getFieldProps("acceptTerms")}
             />
             <span />
